@@ -5,19 +5,12 @@ class Zalo::IncomingMessageService
 
   def perform
     set_contact
-    if params[:event_name] == 'user_submit_info'
-      update_contact_from_shared_info
-      return
-    end
-
-    first_message_processing if @contact.messages.empty?
+    update_contact_from_profile if @contact.messages.empty?
     set_conversation
     @message = @conversation.messages.create!(message_params)
-    Rails.logger.info('Message created')
 
     @message.content_attributes[:in_reply_to_external_id] = params[:message][:quote_msg_id] if params[:message][:quote_msg_id]
 
-    Rails.logger.info('Attaching media')
     attach_media
     @message.save!
   end
@@ -33,15 +26,7 @@ class Zalo::IncomingMessageService
   end
 
   def url_getprofile
-    'https://openapi.zalo.me/v2.0/oa/getprofile'
-  end
-
-  def first_message_processing
-    Rails.logger.info('First message processing')
-    # try to get user info from followed user first
-    update_contact_from_profile
-    # request user info for unfollowed user
-    request_user_info if @contact.name == params[:sender][:id]
+    'https://openapi.zalo.me/v3.0/oa/user/detail'
   end
 
   def get_profile(user_id, access_token)
@@ -52,49 +37,12 @@ class Zalo::IncomingMessageService
     )
   end
 
-  def request_user_info
-    body = request_user_info_body
-    channel.send_message_cs(body, channel.oa_access_token)
-  end
-
-  def request_user_info_body
-    {
-      recipient: {
-        user_id: params[:sender][:id]
-      },
-      # TODO: Need to personalize the below info
-      message: {
-        attachment: {
-          type: 'template',
-          payload: {
-            template_type: 'request_user_info',
-            elements: [{
-              title: 'HoaTieu CRM cảm ơn bạn đã liên hệ',
-              subtitle: 'Nhấp vào đây để cung cấp thông tin của bạn',
-              image_url: 'https://noventiq.si/uploads/resizer/images/2b68b5/ed7a86/d2b6d2/origin-mode1-760x362.jpg'
-            }]
-          }
-        }
-      }
-    }
-  end
-
   def update_contact_from_profile
     response = get_profile(params[:sender][:id], channel.oa_access_token)
     return unless (response['error']).zero?
 
     @contact.update!(name: response['data']['display_name'])
     ::Avatar::AvatarFromUrlJob.perform_later(@contact, response['data']['avatars']['240'])
-  end
-
-  def update_contact_from_shared_info
-    phone_number = params[:info][:phone].to_s
-    phone_number.prepend('+') unless phone_number.start_with?('+')
-
-    @contact.update!(
-      name: params[:info][:name],
-      phone_number: phone_number
-    )
   end
 
   def set_contact
@@ -186,9 +134,7 @@ class Zalo::IncomingMessageService
   end
 
   def attach_file(media)
-    Rails.logger.info("Attaching file #{media}")
     attachment_file = Down.download(media[:payload][:url])
-    Rails.logger.info("Downloaded file #{media}")
     file_name = media[:payload][:name] || attachment_file.original_filename
     @message.attachments.new(
       account_id: @message.account_id,

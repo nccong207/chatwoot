@@ -74,6 +74,7 @@ import PageHeader from '../../SettingsSubPageHeader.vue';
 import router from '../../../../index';
 import globalConfigMixin from 'shared/mixins/globalConfigMixin';
 import accountMixin from '../../../../../mixins/account';
+import ZaloChannel from '../../../../../api/channel/zaloChannel';
 
 export default {
   components: {
@@ -124,41 +125,43 @@ export default {
     startLogin() {
       this.hasLoginStarted = true;
       window.location.replace(
-        'https://oauth.zaloapp.com/v4/oa/permission?app_id=1705469258416327647&redirect_uri=' +
+        'https://oauth.zaloapp.com/v4/oa/permission?app_id=' +
+          window.chatwootConfig.zaloAppId +
+          '&redirect_uri=' +
           window.chatwootConfig.hostURL +
           '/zalo/callback&state=' +
           encodeURIComponent(this.accountId)
       );
     },
 
-    getAccessToken() {
+    async getSecretKey() {
+      const response = await ZaloChannel.secretKey();
+      return response.data.secret_key;
+    },
+
+    async getAccessToken() {
       this.hasLoginStarted = true;
       const url = 'https://oauth.zaloapp.com/v4/oa/access_token';
       const data = new URLSearchParams();
       data.append('code', this.$route.query.code);
       data.append('app_id', window.chatwootConfig.zaloAppId);
       data.append('grant_type', 'authorization_code');
+      const secret_key = await this.getSecretKey();
 
       const config = {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          secret_key: window.chatwootConfig.zaloAppSecret,
+          secret_key: secret_key,
         },
       };
 
       axios
         .post(url, data, config)
         .then(response => {
-          // if (!response.data.error) {
           this.access_token = response.data.access_token;
           this.refresh_token = response.data.refresh_token;
           this.expires_in = response.data.expires_in;
           this.fetchOaData(this.access_token);
-          // } else {
-          //  this.hasError = true;
-          //  this.errorStateMessage = response.data.error_name;
-          //  this.errorStateDescription = response.data.error_description;
-          // }
         })
         .catch(error => {
           this.hasError = true;
