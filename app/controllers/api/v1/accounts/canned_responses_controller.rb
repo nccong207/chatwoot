@@ -6,11 +6,15 @@ class Api::V1::Accounts::CannedResponsesController < Api::V1::Accounts::BaseCont
   end
 
   def create
-    @canned_response = Current.account.canned_responses.new(canned_response_params)
-    @canned_response.save!
+    account = Current.account
+    cb = CannedResponseBuilder.new(account, params)
+    @canned_response = cb.perform
     render json: @canned_response
+  rescue StandardError => e
+    render_could_not_create_error(e.message)
   end
 
+  # TODO
   def update
     @canned_response.update!(canned_response_params)
     render json: @canned_response

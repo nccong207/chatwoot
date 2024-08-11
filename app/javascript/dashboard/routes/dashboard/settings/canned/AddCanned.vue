@@ -33,6 +33,49 @@
               @blur="$v.content.$touch"
             />
           </div>
+          <div
+            v-if="hasAttachments"
+            class="attachment-preview-box"
+            @paste="onPaste"
+          >
+            <attachment-preview
+              class="flex-col mt-4"
+              :attachments="attachedFiles"
+              :remove-attachment="removeAttachment"
+            />
+          </div>
+          <div class="bottom-box">
+            <file-upload
+              ref="upload"
+              v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
+              input-id="cannedAttachment"
+              :size="4096 * 4096"
+              :accept="allowedFileTypes"
+              :multiple="true"
+              :drop="true"
+              :drop-directory="false"
+              :data="{
+                direct_upload_url: '/rails/active_storage/direct_uploads',
+                direct_upload: true,
+              }"
+              @input-file="onFileUpload"
+            >
+              <woot-button
+                class-names="button--upload"
+                :title="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
+                icon="attach"
+                emoji="📎"
+                color-scheme="secondary"
+                variant="smooth"
+                size="small"
+              />
+              <span
+                class="text-slate-500 ltr:ml-1 rtl:mr-1 font-medium text-xs dark:text-slate-400"
+              >
+                {{ $t('NEW_CONVERSATION.FORM.ATTACHMENTS.HELP_TEXT') }}
+              </span>
+            </file-upload>
+          </div>
         </div>
         <div class="flex flex-row justify-end gap-2 py-2 px-0 w-full">
           <woot-submit-button
@@ -60,14 +103,24 @@ import WootSubmitButton from '../../../../components/buttons/FormSubmitButton.vu
 import Modal from '../../../../components/Modal.vue';
 import WootMessageEditor from 'dashboard/components/widgets/WootWriter/Editor.vue';
 import alertMixin from 'shared/mixins/alertMixin';
+import FileUpload from 'vue-upload-component';
+import * as ActiveStorage from 'activestorage';
+import AttachmentPreview from 'dashboard/components/widgets/AttachmentsPreview.vue';
+import { ALLOWED_FILE_TYPES } from 'shared/constants/messages';
+import fileUploadMixin from 'dashboard/mixins/fileUploadMixin';
+import { mapGetters } from 'vuex';
+import WootButton from '../../../../components/ui/WootButton.vue';
 
 export default {
   components: {
+    WootButton,
     WootSubmitButton,
     Modal,
     WootMessageEditor,
+    FileUpload,
+    AttachmentPreview,
   },
-  mixins: [alertMixin],
+  mixins: [alertMixin, fileUploadMixin],
   props: {
     responseContent: {
       type: String,
@@ -87,7 +140,19 @@ export default {
         message: '',
       },
       show: true,
+      attachedFiles: [],
     };
+  },
+  computed: {
+    ...mapGetters({
+      globalConfig: 'globalConfig/get',
+    }),
+    allowedFileTypes() {
+      return ALLOWED_FILE_TYPES;
+    },
+    hasAttachments() {
+      return this.attachedFiles.length;
+    },
   },
   validations: {
     shortCode: {
@@ -98,6 +163,9 @@ export default {
       required,
     },
   },
+  mounted() {
+    ActiveStorage.start();
+  },
   methods: {
     resetForm() {
       this.shortCode = '';
@@ -105,15 +173,32 @@ export default {
       this.$v.shortCode.$reset();
       this.$v.content.$reset();
     },
+    getCannedPayload() {
+      let cannedPayload = {
+        shortCode: this.shortCode,
+        content: this.content,
+      };
+
+      if (this.attachedFiles && this.attachedFiles.length) {
+        cannedPayload.attachments = [];
+        this.attachedFiles.forEach(attachment => {
+          if (this.globalConfig.directUploadsEnabled) {
+            cannedPayload.attachments.push(attachment.blobSignedId);
+          } else {
+            cannedPayload.attachments.push(attachment.resource.file);
+          }
+        });
+      }
+
+      return cannedPayload;
+    },
     addCannedResponse() {
       // Show loading on button
       this.addCanned.showLoading = true;
+      const cannedPayload = this.getCannedPayload();
       // Make API Calls
       this.$store
-        .dispatch('createCannedResponse', {
-          short_code: this.shortCode,
-          content: this.content,
-        })
+        .dispatch('createCannedResponse', cannedPayload)
         .then(() => {
           // Reset Form, Show success message
           this.addCanned.showLoading = false;
@@ -127,6 +212,35 @@ export default {
             error?.message || this.$t('CANNED_MGMT.ADD.API.ERROR_MESSAGE');
           this.showAlert(errorMessage);
         });
+    },
+    attachFile({ blob, file }) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.file);
+      reader.onloadend = () => {
+        this.attachedFiles.push({
+          resource: blob || file,
+          thumb: reader.result,
+          blobSignedId: blob ? blob.signed_id : undefined,
+        });
+      };
+    },
+    removeAttachment(itemIndex) {
+      this.attachedFiles = this.attachedFiles.filter(
+        (item, index) => itemIndex !== index
+      );
+    },
+    onPaste(e) {
+      const data = e.clipboardData.files;
+      if (!this.showRichContentEditor && data.length !== 0) {
+        this.$refs.messageInput.$el.blur();
+      }
+      if (!data.length || !data[0]) {
+        return;
+      }
+      data.forEach(file => {
+        const { name, type, size } = file;
+        this.onFileUpload({ name, type, size, file: file });
+      });
     },
   },
 };
@@ -145,5 +259,8 @@ export default {
       @apply text-base;
     }
   }
+}
+.bottom-box {
+  @apply flex py-3 gap-2;
 }
 </style>
