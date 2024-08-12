@@ -71,6 +71,14 @@
         "YES": "Có, xóa ",
         "NO": "Không, giữ "
       }
+    },
+    "CANNED_BOTTOM_PANEL": {
+      "TIP_ATTACH_ICON": "Đính kèm tập tin",
+      "DRAG_DROP": "Kéo thả vào đây để đính kèm",
+      "ATTACHMENTS": {
+        "SELECT": "Chọn File",
+        "HELP_TEXT": "Kéo thả file đính kèm tại đây"
+      }
     }
   }
 }

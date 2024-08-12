@@ -44,38 +44,12 @@
               :remove-attachment="removeAttachment"
             />
           </div>
-          <div class="bottom-box">
-            <file-upload
-              ref="upload"
-              v-tooltip.top-end="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
-              input-id="cannedAttachment"
-              :size="4096 * 4096"
-              :accept="allowedFileTypes"
-              :multiple="true"
-              :drop="true"
-              :drop-directory="false"
-              :data="{
-                direct_upload_url: '/rails/active_storage/direct_uploads',
-                direct_upload: true,
-              }"
-              @input-file="onFileUpload"
-            >
-              <woot-button
-                class-names="button--upload"
-                :title="$t('CONVERSATION.REPLYBOX.TIP_ATTACH_ICON')"
-                icon="attach"
-                emoji="📎"
-                color-scheme="secondary"
-                variant="smooth"
-                size="small"
-              />
-              <span
-                class="text-slate-500 ltr:ml-1 rtl:mr-1 font-medium text-xs dark:text-slate-400"
-              >
-                {{ $t('NEW_CONVERSATION.FORM.ATTACHMENTS.HELP_TEXT') }}
-              </span>
-            </file-upload>
-          </div>
+          <canned-bottom-panel
+            :enable-multiple-file-upload="true"
+            :on-file-upload="onFileUpload"
+            :show-file-upload="true"
+            :show-attach-help-text="true"
+          />
         </div>
         <div class="flex flex-row justify-end gap-2 py-2 px-0 w-full">
           <woot-submit-button
@@ -103,21 +77,25 @@ import WootSubmitButton from '../../../../components/buttons/FormSubmitButton.vu
 import Modal from '../../../../components/Modal.vue';
 import WootMessageEditor from 'dashboard/components/widgets/WootWriter/Editor.vue';
 import alertMixin from 'shared/mixins/alertMixin';
-import FileUpload from 'vue-upload-component';
-import * as ActiveStorage from 'activestorage';
 import AttachmentPreview from 'dashboard/components/widgets/AttachmentsPreview.vue';
-import { ALLOWED_FILE_TYPES } from 'shared/constants/messages';
+import CannedBottomPanel from 'dashboard/components/widgets/WootWriter/CannedBottomPanel.vue';
 import fileUploadMixin from 'dashboard/mixins/fileUploadMixin';
 import { mapGetters } from 'vuex';
-import WootButton from '../../../../components/ui/WootButton.vue';
+// import { BUS_EVENTS } from 'shared/constants/busEvents';
+// import { buildHotKeys } from 'shared/helpers/KeyboardHelpers';
+// import {
+//   getMessageVariables,
+//   getUndefinedVariablesInMessage,
+//   replaceVariablesInMessage,
+// } from '@chatwoot/utils';
+// import { trimContent, debounce } from '@chatwoot/utils';
 
 export default {
   components: {
-    WootButton,
+    CannedBottomPanel,
     WootSubmitButton,
     Modal,
     WootMessageEditor,
-    FileUpload,
     AttachmentPreview,
   },
   mixins: [alertMixin, fileUploadMixin],
@@ -147,9 +125,6 @@ export default {
     ...mapGetters({
       globalConfig: 'globalConfig/get',
     }),
-    allowedFileTypes() {
-      return ALLOWED_FILE_TYPES;
-    },
     hasAttachments() {
       return this.attachedFiles.length;
     },
@@ -164,7 +139,10 @@ export default {
     },
   },
   mounted() {
-    ActiveStorage.start();
+    document.addEventListener('paste', this.onPaste);
+  },
+  destroyed() {
+    document.removeEventListener('paste', this.onPaste);
   },
   methods: {
     resetForm() {
@@ -231,9 +209,6 @@ export default {
     },
     onPaste(e) {
       const data = e.clipboardData.files;
-      if (!this.showRichContentEditor && data.length !== 0) {
-        this.$refs.messageInput.$el.blur();
-      }
       if (!data.length || !data[0]) {
         return;
       }
@@ -259,8 +234,5 @@ export default {
       @apply text-base;
     }
   }
-}
-.bottom-box {
-  @apply flex py-3 gap-2;
 }
 </style>
