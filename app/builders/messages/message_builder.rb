@@ -62,22 +62,25 @@ class Messages::MessageBuilder
     return if @attachments.blank?
 
     @attachments.each do |uploaded_attachment|
-      filename = I18n.transliterate(uploaded_attachment.original_filename)
-      filename = filename.gsub(/[?]/, '')
-      uploaded_attachment.original_filename = filename
-
-      attachment = @message.attachments.build(
-        account_id: @message.account_id,
-        file: uploaded_attachment
-      )
-
-      attachment.file_type = if uploaded_attachment.is_a?(String)
-                               file_type_by_signed_id(
-                                 uploaded_attachment
-                               )
-                             else
-                               file_type(uploaded_attachment&.content_type)
-                             end
+      if uploaded_attachment.is_a?(String)
+        attachment = @message.attachments.build(account_id: @message.account_id)
+        # Attach to the file blob
+        signed_id = uploaded_attachment
+        blob = ActiveStorage::Blob.find_signed(signed_id)
+        attachment.file.attach(blob)
+        # Assign value of File Type
+        attachment.file_type = file_type_by_signed_id(uploaded_attachment)
+      else
+        filename = I18n.transliterate(uploaded_attachment.original_filename)
+        filename = filename.gsub(/[?]/, '')
+        uploaded_attachment.original_filename = filename
+        attachment = @message.attachments.build(
+          account_id: @message.account_id,
+          file: uploaded_attachment
+        )
+        # Assign value of File Type
+        attachment.file_type = file_type(uploaded_attachment.content_type)
+      end
     end
   end
 
