@@ -12,6 +12,7 @@
       "TABLE_HEADER": [
         "Mã tắt",
         "Nội dung",
+        "FILE",
         "Hành động"
       ]
     },

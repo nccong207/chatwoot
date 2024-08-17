@@ -2,18 +2,14 @@
 
 import ApiClient from './ApiClient';
 
-export const buildCannedCreatePayload = ({
-  content,
-  shortCode,
-  attachments,
-}) => {
+export const buildCannedPayload = ({ content, shortCode, files }) => {
   let payload;
-  if (attachments && attachments.length !== 0) {
+  if (files && files.length !== 0) {
     payload = new FormData();
     payload.append('content', content);
     payload.append('short_code', shortCode);
 
-    attachments.forEach(file => {
+    files.forEach(file => {
       payload.append('attachments[]', file);
     });
   } else {
@@ -35,14 +31,26 @@ class CannedResponse extends ApiClient {
     return axios.get(url);
   }
 
-  create({ content, shortCode, attachments }) {
+  create({ content, shortCode, files }) {
     return axios({
       method: 'post',
       url: this.url,
-      data: buildCannedCreatePayload({
+      data: buildCannedPayload({
         content,
         shortCode,
-        attachments,
+        files,
+      }),
+    });
+  }
+
+  update({ id, content, shortCode, files }) {
+    return axios({
+      method: 'patch',
+      url: `${this.url}/${id}`,
+      data: buildCannedPayload({
+        content,
+        shortCode,
+        files,
       }),
     });
   }

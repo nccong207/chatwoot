@@ -5,8 +5,6 @@ class CannedResponseBuilder
   def initialize(account, params)
     @params = params
     @account = account
-    return unless params.instance_of?(ActionController::Parameters) # TODO: Need to check this line
-
     @attachments = params[:attachments]
   end
 
@@ -26,6 +24,7 @@ class CannedResponseBuilder
       filename = I18n.transliterate(uploaded_attachment.original_filename)
       filename = filename.gsub(/[?]/, '')
       uploaded_attachment.original_filename = filename
+
       attachment = @canned_response.canned_attachments.build(
         account_id: @canned_response.account_id,
         file: uploaded_attachment

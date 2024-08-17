@@ -33,6 +33,9 @@
               @blur="$v.content.$touch"
             />
           </div>
+        </div>
+
+        <div class="w-full">
           <div
             v-if="hasAttachments"
             class="attachment-preview-box"
@@ -81,22 +84,14 @@ import AttachmentPreview from 'dashboard/components/widgets/AttachmentsPreview.v
 import CannedBottomPanel from 'dashboard/components/widgets/WootWriter/CannedBottomPanel.vue';
 import fileUploadMixin from 'dashboard/mixins/fileUploadMixin';
 import { mapGetters } from 'vuex';
-// import { BUS_EVENTS } from 'shared/constants/busEvents';
-// import { buildHotKeys } from 'shared/helpers/KeyboardHelpers';
-// import {
-//   getMessageVariables,
-//   getUndefinedVariablesInMessage,
-//   replaceVariablesInMessage,
-// } from '@chatwoot/utils';
-// import { trimContent, debounce } from '@chatwoot/utils';
 
 export default {
   components: {
-    CannedBottomPanel,
     WootSubmitButton,
     Modal,
     WootMessageEditor,
     AttachmentPreview,
+    CannedBottomPanel,
   },
   mixins: [alertMixin, fileUploadMixin],
   props: {
@@ -148,6 +143,7 @@ export default {
     resetForm() {
       this.shortCode = '';
       this.content = '';
+      this.attachedFiles = [];
       this.$v.shortCode.$reset();
       this.$v.content.$reset();
     },
@@ -158,12 +154,12 @@ export default {
       };
 
       if (this.attachedFiles && this.attachedFiles.length) {
-        cannedPayload.attachments = [];
+        cannedPayload.files = [];
         this.attachedFiles.forEach(attachment => {
           if (this.globalConfig.directUploadsEnabled) {
-            cannedPayload.attachments.push(attachment.blobSignedId);
+            cannedPayload.files.push(attachment.blobSignedId);
           } else {
-            cannedPayload.attachments.push(attachment.resource.file);
+            cannedPayload.files.push(attachment.resource.file);
           }
         });
       }
@@ -173,6 +169,7 @@ export default {
     addCannedResponse() {
       // Show loading on button
       this.addCanned.showLoading = true;
+      // Get payload for API call
       const cannedPayload = this.getCannedPayload();
       // Make API Calls
       this.$store

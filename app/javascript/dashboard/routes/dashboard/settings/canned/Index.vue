@@ -53,6 +53,18 @@
               <td class="break-all whitespace-normal">
                 {{ cannedItem.content }}
               </td>
+              <td class="max-w-[8.75rem]">
+                <div
+                  v-if="cannedItem.attachments && cannedItem.attachments.length"
+                >
+                  <thumbnail
+                    :src="cannedItem.attachments[0].thumb_url"
+                    size="36px"
+                    :txt-badge="`SL:${cannedItem.attachments.length}`"
+                  />
+                </div>
+                <div v-else class="text-center">---</div>
+              </td>
               <!-- Action Buttons -->
               <td class="flex justify-end gap-1 min-w-[12.5rem]">
                 <woot-button
@@ -95,6 +107,7 @@
         :id="selectedResponse.id"
         :edshort-code="selectedResponse.short_code"
         :edcontent="selectedResponse.content"
+        :edattachments="selectedResponse.attachments"
         :on-close="hideEditPopup"
       />
     </woot-modal>
@@ -116,9 +129,11 @@
 import { mapGetters } from 'vuex';
 import AddCanned from './AddCanned.vue';
 import EditCanned from './EditCanned.vue';
+import Thumbnail from '../../../../components/widgets/Thumbnail.vue';
 
 export default {
   components: {
+    Thumbnail,
     AddCanned,
     EditCanned,
   },
