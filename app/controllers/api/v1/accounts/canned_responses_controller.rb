@@ -32,7 +32,7 @@ class Api::V1::Accounts::CannedResponsesController < Api::V1::Accounts::BaseCont
   end
 
   def canned_response_params
-    params.permit(:short_code, :content, attachments: [])
+    params.require(:canned_response).permit(:short_code, :content, attachments: [])
   end
 
   def fetch_canned_responses

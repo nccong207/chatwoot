@@ -6,16 +6,16 @@ export const buildCannedPayload = ({ content, shortCode, files }) => {
   let payload;
   if (files && files.length !== 0) {
     payload = new FormData();
-    payload.append('content', content);
-    payload.append('short_code', shortCode);
+    payload.append('canned_response[content]', content);
+    payload.append('canned_response[short_code]', shortCode);
 
     files.forEach(file => {
-      payload.append('attachments[]', file);
+      payload.append('canned_response[attachments][]', file);
     });
   } else {
     payload = {
       content: content,
-      shortCode: shortCode,
+      short_code: shortCode,
     };
   }
   return payload;
