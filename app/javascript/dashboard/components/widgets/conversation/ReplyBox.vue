@@ -94,6 +94,7 @@
         @toggle-canned-menu="toggleCannedMenu"
         @toggle-variables-menu="toggleVariablesMenu"
         @clear-selection="clearEditorSelection"
+        @replace-attached-files="replaceAttachedFiles"
       />
     </div>
     <div v-if="hasAttachments" class="attachment-preview-box" @paste="onPaste">

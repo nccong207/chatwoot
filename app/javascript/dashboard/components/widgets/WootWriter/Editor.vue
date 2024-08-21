@@ -577,7 +577,7 @@ export default {
       this.$track(CONVERSATION_EVENTS.INSERTED_A_CANNED_RESPONSE);
 
       if (images && images.length) {
-        this.replaceAttachedFiles(images);
+        this.$emit('replace-attached-files', images);
       }
 
       return false;
@@ -616,11 +616,12 @@ export default {
 
       this.$refs.imageUpload.value = '';
     },
-    replaceAttachedFiles(images) {
-      images.forEach(({ data_url }) => {
-        this.onImageInsertInEditor(data_url);
-      });
-    },
+    // replaceAttachedFiles(images) {
+    //   images.forEach(({ data_url }) => {
+    //     this.onImageInsertInEditor(data_url);
+    //   });
+    //   this.$emit('replaceAttachedFiles')
+    // },
     async uploadImageToStorage(file) {
       try {
         const { fileUrl } = await uploadFile(file);

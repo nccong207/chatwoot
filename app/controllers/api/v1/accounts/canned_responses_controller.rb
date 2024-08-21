@@ -13,8 +13,6 @@ class Api::V1::Accounts::CannedResponsesController < Api::V1::Accounts::BaseCont
     account = Current.account
     cb = CannedResponseBuilder.new(account, canned_response_params)
     @canned_response = cb.perform
-  rescue StandardError => e
-    render_could_not_create_error(e.message)
   end
 
   def update
