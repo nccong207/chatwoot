@@ -12,9 +12,10 @@
       "TABLE_HEADER": [
         "Mã tắt",
         "Nội dung",
-        "FILE",
+        "Tập tin",
         "Hành động"
-      ]
+      ],
+      "QTY": "SL:%{number}"
     },
     "ADD": {
       "TITLE": "Thêm tin nhắn mẫu",

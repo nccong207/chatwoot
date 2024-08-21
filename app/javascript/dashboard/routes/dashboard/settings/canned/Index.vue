@@ -53,20 +53,24 @@
               <td class="break-all whitespace-normal">
                 {{ cannedItem.content }}
               </td>
-              <td class="max-w-[8.75rem]">
+              <td class="w-[7.75rem]">
                 <div
                   v-if="cannedItem.attachments && cannedItem.attachments.length"
                 >
                   <thumbnail
                     :src="cannedItem.attachments[0].thumb_url"
                     size="36px"
-                    :txt-badge="`SL:${cannedItem.attachments.length}`"
+                    :txt-badge="
+                      $t('CANNED_MGMT.LIST.QTY', {
+                        number: cannedItem.attachments.length,
+                      })
+                    "
                   />
                 </div>
-                <div v-else class="text-center">---</div>
+                <div v-else>---</div>
               </td>
               <!-- Action Buttons -->
-              <td class="flex justify-end gap-1 min-w-[12.5rem]">
+              <td class="flex justify-end gap-1 min-w-[10.5rem]">
                 <woot-button
                   v-tooltip.top="$t('CANNED_MGMT.EDIT.BUTTON_TEXT')"
                   variant="smooth"
