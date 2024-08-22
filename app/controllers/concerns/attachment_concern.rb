@@ -31,7 +31,7 @@ module AttachmentConcern
 
     attachments_to_be_deleted = old_attachments_of_resource.select do |attachment|
       submitted_attachments
-        .reject { |i| i.is_a?(Hash) }
+        .reject { |i| i.is_a?(ActionDispatch::Http::UploadedFile) }
         .exclude?(attachment.file_blob.signed_id)
     end
 
