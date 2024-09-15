@@ -43,15 +43,15 @@ class Contacts::FilterService < FilterService
     "EXISTS (#{conversation_plan_model_relation_query} #{conversation_plan_query}) #{query_operator}"
   end
 
-  def build_conversation_plan_combined_query(query_hash, timezone = 'Asia/Ho_Chi_Minh')
+  def build_conversation_plan_combined_query(query_hash)
     combined_query_array = []
 
     case filter_values(query_hash) # NOTICE: when 'all' => DO NOTHING
     when 'today'
-      combined_query_array << 'conversation_plans.snoozed_until > now()::date'
+      combined_query_array << 'conversation_plans.snoozed_until::date = now()::date'
     when 'this_week'
-      beginning_of_week = Time.zone.now.in_time_zone(timezone).at_beginning_of_week.to_fs(:db)
-      end_of_week = Time.zone.now.in_time_zone(timezone).at_end_of_week.to_fs(:db)
+      beginning_of_week = Time.zone.now.at_beginning_of_week.to_fs(:db)
+      end_of_week = Time.zone.now.at_end_of_week.to_fs(:db)
       combined_query_array <<
         "conversation_plans.snoozed_until >= timestamp '#{beginning_of_week}' " \
         "AND conversation_plans.snoozed_until < timestamp '#{end_of_week}'"
