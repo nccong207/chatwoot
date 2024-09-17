@@ -255,10 +255,8 @@ export default {
           if (status === 'resolved') {
             this.showStageModal = true;
 
-            if (this.currentChat?.contact_inbox?.contact_id) {
-              const {
-                contact_inbox: { contact_id },
-              } = this.currentChat;
+            const contact_id = this.currentChat?.meta?.sender?.id;
+            if (contact_id) {
               this.$store.dispatch(
                 'contacts/fetchConversationPlans',
                 contact_id
