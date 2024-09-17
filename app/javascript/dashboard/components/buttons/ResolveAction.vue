@@ -254,10 +254,11 @@ export default {
           this.isLoading = false;
           if (status === 'resolved') {
             this.showStageModal = true;
-            const {
-              contact_inbox: { contact_id },
-            } = this.currentChat;
-            if (contact_id) {
+
+            if (this.currentChat?.contact_inbox?.contact_id) {
+              const {
+                contact_inbox: { contact_id },
+              } = this.currentChat;
               this.$store.dispatch(
                 'contacts/fetchConversationPlans',
                 contact_id
