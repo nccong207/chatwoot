@@ -86,7 +86,7 @@ class Api::V2::Accounts::ReportsController < Api::V1::Accounts::BaseController
   end
 
   def conversions
-    return head :unprocessable_entity if params[:type].blank?
+    return head :unprocessable_entity if params[:criteria_type].blank?
 
     render json: conversion_metrics
   end
@@ -154,7 +154,9 @@ class Api::V2::Accounts::ReportsController < Api::V1::Accounts::BaseController
   def conversion_params
     {
       criteria_type: params[:criteria_type].to_sym || :inbox,
-      page: params[:page].presence || 1
+      page: params[:page].presence || 1,
+      since: params[:since],
+      until: params[:until]
     }
   end
 
