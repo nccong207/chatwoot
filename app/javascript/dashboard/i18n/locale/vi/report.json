@@ -486,6 +486,9 @@
       }
     }
   },
+  "CONVERSION_REPORTS": {
+    "HEADER": "Báo cáo thống kê chuyển đổi khách hàng"
+  },
   "OVERVIEW_REPORTS": {
     "HEADER": "Tổng quan hội thoại",
     "LIVE": "Live",
