@@ -124,6 +124,20 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
     end
   end
 
+  def conversion_metrics
+    case params[:criteria_type]
+    when :team
+      # TODO
+    when :data_source
+      # TODO
+    when :agent
+      # TODO
+    when :inbox
+      # TODO
+    end
+    []
+  end
+
   private
 
   def metric_valid?
