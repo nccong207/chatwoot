@@ -215,7 +215,7 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
     teams.each_with_object([]) do |team, arr|
       arr << {
         id: team.id,
-        name: team.name,
+        name: team.name.humanize,
         metric: live_conversions(relation: team.contacts)
       }
     end
@@ -224,12 +224,11 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
   def data_source_conversion_metrics
     return [] unless @qualified_stage.present? && @won_stage.present?
 
-    # TODO: move this to constants
-    data_sources = ['Online', 'Trực tiếp', 'Giới thiệu']
+    data_sources = CustomAttributeDefinition.find_by(account_id: account.id, attribute_key: 'nguon_thong_tin').attribute_values
 
     data_sources.each_with_object([]).with_index do |(data_source, arr), index|
       base_relation =
-        Contact.where("LOWER(contacts.custom_attributes ->> 'nguon_thong_tin')::text = :value", value: "%#{data_source}%")
+        Contact.where("custom_attributes->>'nguon_thong_tin' = ?", data_source)
       arr << {
         id: index,
         name: data_source,
@@ -265,7 +264,7 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
       arr << {
         id: inbox.id,
         name: inbox.name,
-        channel_type: inbox.channel_type,
+        inbox_type: inbox.inbox_type,
         thumbnail: inbox.avatar_url,
         metric: live_conversions(relation: inbox.contacts)
       }

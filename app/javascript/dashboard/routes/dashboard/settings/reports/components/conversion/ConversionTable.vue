@@ -24,7 +24,7 @@
     />
     <div v-if="conversionMetrics.length > 0" class="table-pagination">
       <ve-pagination
-        :total="conversionMetrics.length"
+        :total="resources.length"
         :page-index="pageIndex"
         :page-size="10"
         :page-size-option="[10]"
@@ -39,6 +39,7 @@ import { VeTable, VePagination } from 'vue-easytable';
 import Spinner from 'shared/components/Spinner.vue';
 import EmptyState from 'dashboard/components/widgets/EmptyState.vue';
 import rtlMixin from 'shared/mixins/rtlMixin';
+import Thumbnail from 'dashboard/components/widgets/Thumbnail.vue';
 
 export default {
   name: 'ConversionTable',
@@ -53,6 +54,10 @@ export default {
     criteriaKey: {
       type: String,
       required: true,
+    },
+    resources: {
+      type: Array,
+      default: () => [],
     },
     conversionMetrics: {
       type: Array,
@@ -72,10 +77,18 @@ export default {
       return this.conversionMetrics.map(metric => {
         const {
           name,
+          email,
+          thumbnail,
+          availability,
+          inbox_type,
           metric: { won, qualified, ratio },
         } = metric;
         return {
           resource: name,
+          email,
+          thumbnail,
+          status: availability,
+          inboxType: inbox_type,
           qualified,
           won,
           ratio,
@@ -91,6 +104,7 @@ export default {
           fixed: 'left',
           align: this.isRTLView ? 'right' : 'left',
           width: 25,
+          ...this.additionalAttributes,
         },
         {
           field: 'qualified',
@@ -114,6 +128,49 @@ export default {
           width: 10,
         },
       ];
+    },
+    additionalAttributes() {
+      switch (this.criteriaKey) {
+        case 'agent':
+          return {
+            renderBodyCell: ({ row }) => (
+              <div class="row-user-block">
+                <Thumbnail
+                  src={row.thumbnail}
+                  size="32px"
+                  username={row.resource}
+                  status={row.status}
+                />
+                <div class="user-block ">
+                  <h6 class="title overflow-hidden whitespace-nowrap text-ellipsis">
+                    {row.resource}
+                  </h6>
+                  <span class="sub-title">{row.email}</span>
+                </div>
+              </div>
+            ),
+          };
+        case 'inbox':
+          return {
+            renderBodyCell: ({ row }) => (
+              <div class="row-user-block">
+                <Thumbnail
+                  src={row.thumbnail}
+                  size="32px"
+                  username={row.resource}
+                />
+                <div class="user-block">
+                  <h6 class="title overflow-hidden whitespace-nowrap text-ellipsis">
+                    {row.resource}
+                  </h6>
+                  <span class="sub-title">{row.inboxType}</span>
+                </div>
+              </div>
+            ),
+          };
+        default:
+          return {};
+      }
     },
   },
   methods: {

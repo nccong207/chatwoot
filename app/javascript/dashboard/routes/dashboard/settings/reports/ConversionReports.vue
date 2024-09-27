@@ -19,14 +19,16 @@
           "
         >
           <conversion-table
+            :resources="teams"
             :conversion-metrics="teamConversionMetric"
-            criteria-key="agent"
+            criteria-key="team"
             :page-index="teamPageIndex"
             :is-loading="uiFlags.isFetchingTeamConversionMetric"
             @page-change="onTeamPageNumberChange"
           />
         </conversion-metric-card>
       </div>
+
       <div class="w-full max-w-full md:w-[50%] md:max-w-[50%]">
         <conversion-metric-card
           :header="$t('CONVERSION_REPORTS.DATA_SOURCE_CONVERSIONS.HEADER')"
@@ -36,6 +38,7 @@
           "
         >
           <conversion-table
+            :resources="dataResources"
             :conversion-metrics="dataSourceConversionMetric"
             criteria-key="data_source"
             :page-index="dataSourcePageIndex"
@@ -44,6 +47,7 @@
           />
         </conversion-metric-card>
       </div>
+
       <div class="w-full max-w-full md:w-[50%] md:max-w-[50%]">
         <conversion-metric-card
           :header="$t('CONVERSION_REPORTS.AGENT_CONVERSIONS.HEADER')"
@@ -53,14 +57,16 @@
           "
         >
           <conversion-table
+            :resources="agents"
             :conversion-metrics="agentConversionMetric"
-            criteria-key="team"
+            criteria-key="agent"
             :page-index="agentPageIndex"
             :is-loading="uiFlags.isFetchingAgentConversionMetric"
             @page-change="onAgentPageNumberChange"
           />
         </conversion-metric-card>
       </div>
+
       <div class="w-full max-w-full md:w-[50%] md:max-w-[50%]">
         <conversion-metric-card
           :header="$t('CONVERSION_REPORTS.INBOX_CONVERSIONS.HEADER')"
@@ -70,6 +76,7 @@
           "
         >
           <conversion-table
+            :resources="inboxes"
             :conversion-metrics="inboxConversionMetric"
             criteria-key="inbox"
             :page-index="inboxPageIndex"
@@ -110,39 +117,63 @@ export default {
   },
   computed: {
     ...mapGetters({
+      teams: 'teams/getTeams',
+      inboxes: 'inboxes/getInboxes',
+      agents: 'agents/getAgents',
       teamConversionMetric: 'getTeamConversionMetric',
       dataSourceConversionMetric: 'getDataSourceConversionMetric',
       agentConversionMetric: 'getAgentConversionMetric',
       inboxConversionMetric: 'getInboxConversionMetric',
       uiFlags: 'getConversionUIFlags',
     }),
+    dataResources() {
+      return (
+        this.$store.getters['attributes/getAttributeByKey']('nguon_thong_tin')
+          ?.attribute_values || []
+      );
+    },
   },
   mounted() {
-    this.fetchAllData();
+    this.$store.dispatch('teams/get');
+    this.$store.dispatch('attributes/get');
+    this.$store.dispatch('agents/get');
+    this.$store.dispatch('inboxes/get');
+    this.fetchTablesData();
   },
   methods: {
-    fetchAllData() {
-      this.fetchTablesData();
-    },
     fetchTablesData(criteriaKeys = ['TEAM', 'DATA_SOURCE', 'AGENT', 'INBOX']) {
       criteriaKeys.forEach(async key => {
         try {
           const pascalKey = camelCase(key, { pascalCase: true });
           await this.$store.dispatch(`fetch${pascalKey}ConversionReport`, {
             criteria_type: key.toLowerCase(),
-            ...this.getRequestPayload(),
+            ...this.getRequestPayload(key),
           });
         } catch {
           this.showAlert(this.$t('REPORT.DATA_FETCHING_FAILED'));
         }
       });
     },
-    getRequestPayload() {
+    getRequestPayload(criteriaKey) {
       const { from, to } = this;
-
+      const getPageIndex = key => {
+        switch (key) {
+          case 'TEAM':
+            return this.teamPageIndex;
+          case 'DATA_SOURCE':
+            return this.dataSourcePageIndex;
+          case 'AGENT':
+            return this.agentPageIndex;
+          case 'INBOX':
+            return this.inboxPageIndex;
+          default:
+            return 1;
+        }
+      };
       return {
         from,
         to,
+        page: getPageIndex(criteriaKey),
       };
     },
     onTeamPageNumberChange(pageIndex) {
@@ -164,7 +195,7 @@ export default {
     onFilterChange({ from, to }) {
       this.from = from;
       this.to = to;
-      this.fetchAllData();
+      this.fetchTablesData();
 
       // TODO
       this.$track(REPORTS_EVENTS.FILTER_REPORT, {
