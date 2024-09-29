@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 overflow-auto p-2">
+  <div class="flex-1 overflow-auto">
     <div class="p-2">
       <report-filter-selector
         :show-agents-filter="false"
@@ -197,7 +197,6 @@ export default {
       this.to = to;
       this.fetchTablesData();
 
-      // TODO
       this.$track(REPORTS_EVENTS.FILTER_REPORT, {
         filterValue: { from, to },
         reportType: 'conversion',

@@ -141,7 +141,9 @@ class Api::V2::Accounts::ReportsController < Api::V1::Accounts::BaseController
     {
       type: params[:type].to_sym,
       user_id: params[:user_id],
-      page: params[:page].presence || 1
+      page: params[:page].presence || 1,
+      since: params[:since],
+      until: params[:until]
     }
   end
 

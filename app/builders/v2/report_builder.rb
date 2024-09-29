@@ -197,13 +197,13 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
   end
 
   def live_conversations
-    @open_conversations = scope.conversations.where(account_id: @account.id).open
+    @open_conversations = scope.conversations.where(account_id: @account.id, created_at: range).open
     metric = {
       open: @open_conversations.count,
       unattended: @open_conversations.unattended.count
     }
     metric[:unassigned] = @open_conversations.unassigned.count if params[:type].equal?(:account)
-    metric[:resolved] = scope.conversations.where(account_id: @account.id).resolved.count
+    metric[:resolved] = scope.conversations.where(account_id: @account.id, created_at: range).resolved.count
     metric
   end
 
@@ -285,7 +285,8 @@ class V2::ReportBuilder # rubocop:disable Metrics/ClassLength
 
     result = {}
     stages.each do |stage|
-      result[stage.code] = @user ? stage.contacts.where(assignee_id: @user.id).count : stage.contacts.count
+      result[stage.code] =
+        @user ? stage.contacts.where(assignee_id: @user.id, created_at: range).count : stage.contacts.where(created_at: range).count
     end
     result
   end
