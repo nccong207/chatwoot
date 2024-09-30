@@ -190,6 +190,6 @@ class Api::V2::Accounts::ReportsController < Api::V1::Accounts::BaseController
   end
 
   def conversion_metrics
-    V2::ReportBuilder.new(Current.account, conversion_params).conversion_metrics
+    V2::Reports::ConversionMetricsBuilder.new(Current.account, conversion_params).metrics
   end
 end

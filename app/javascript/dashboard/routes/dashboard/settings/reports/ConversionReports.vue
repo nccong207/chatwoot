@@ -38,7 +38,7 @@
           "
         >
           <conversion-table
-            :resources="dataResources"
+            :resources="dataSourceConversionMetric"
             :conversion-metrics="dataSourceConversionMetric"
             criteria-key="data_source"
             :page-index="dataSourcePageIndex"
@@ -126,12 +126,6 @@ export default {
       inboxConversionMetric: 'getInboxConversionMetric',
       uiFlags: 'getConversionUIFlags',
     }),
-    dataResources() {
-      return (
-        this.$store.getters['attributes/getAttributeByKey']('nguon_thong_tin')
-          ?.attribute_values || []
-      );
-    },
   },
   mounted() {
     this.$store.dispatch('teams/get');
