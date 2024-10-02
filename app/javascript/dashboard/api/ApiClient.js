@@ -58,6 +58,10 @@ class ApiClient {
   delete(id) {
     return axios.delete(`${this.url}/${id}`);
   }
+
+  getDataSourceValues() {
+    return axios.get(`${this.url}/data_source_values`);
+  }
 }
 
 export default ApiClient;
