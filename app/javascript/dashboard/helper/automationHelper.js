@@ -1,8 +1,9 @@
 import {
   OPERATOR_TYPES_1,
-  OPERATOR_TYPES_3,
   OPERATOR_TYPES_4,
+  OPERATOR_TYPES_7,
 } from 'dashboard/routes/dashboard/settings/automation/operators';
+import { AUTOMATION_CONTACT_EVENTS } from 'dashboard/routes/dashboard/settings/automation/constants';
 import filterQueryGenerator from './filterQueryGenerator';
 import actionQueryGenerator from './actionQueryGenerator';
 const MESSAGE_CONDITION_VALUES = [
@@ -89,7 +90,7 @@ export const isCustomAttributeList = (customAttributes, type) => {
 export const getOperatorTypes = key => {
   const operatorMap = {
     list: OPERATOR_TYPES_1,
-    text: OPERATOR_TYPES_3,
+    text: OPERATOR_TYPES_7,
     number: OPERATOR_TYPES_1,
     link: OPERATOR_TYPES_1,
     date: OPERATOR_TYPES_4,
@@ -134,8 +135,11 @@ export const getActionOptions = ({
   teams,
   labels,
   slaPolicies,
+  stages,
   type,
 }) => {
+  // This method helps get options for the dropdown of user input (into 'action' section)
+  // It has been called into methodMixin.js
   const actionsMap = {
     assign_agent: agentList(agents),
     assign_team: teams,
@@ -144,6 +148,7 @@ export const getActionOptions = ({
     remove_label: generateConditionOptions(labels, 'title'),
     change_priority: PRIORITY_CONDITION_VALUES,
     add_sla: slaPolicies,
+    update_contact_stage: stages,
   };
   return actionsMap[type];
 };
@@ -159,8 +164,12 @@ export const getConditionOptions = ({
   languages,
   statusFilterOptions,
   teams,
+  stages,
+  products,
   type,
 }) => {
+  // This method helps get options for the dropdown of user input (into 'condition' section)
+  // It has been called into methodMixin.js
   if (isCustomAttributeCheckbox(customAttributes, type)) {
     return booleanFilterOptions;
   }
@@ -175,6 +184,8 @@ export const getConditionOptions = ({
     contact: contacts,
     inbox_id: inboxes,
     team_id: teams,
+    stage_id: stages,
+    product_id: products,
     campaigns: generateConditionOptions(campaigns),
     browser_language: languages,
     conversation_language: languages,
@@ -219,6 +230,18 @@ export const getDefaultConditions = eventName => {
       },
     ];
   }
+  if (AUTOMATION_CONTACT_EVENTS.includes(eventName)) {
+    return [
+      {
+        attribute_key: 'stage_id',
+        filter_operator: 'equal_to',
+        values: '',
+        query_operator: 'and',
+        custom_attribute_type: '',
+      },
+    ];
+  }
+
   return [
     {
       attribute_key: 'status',

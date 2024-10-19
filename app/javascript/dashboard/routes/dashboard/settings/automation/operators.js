@@ -111,3 +111,21 @@ export const OPERATOR_TYPES_6 = [
     label: 'Starts With',
   },
 ];
+export const OPERATOR_TYPES_7 = [
+  {
+    value: 'contains',
+    label: 'Contains',
+  },
+  {
+    value: 'does_not_contain',
+    label: 'Does not contain',
+  },
+  {
+    value: 'is_present',
+    label: 'Is present',
+  },
+  {
+    value: 'is_not_present',
+    label: 'Is not present',
+  },
+];
