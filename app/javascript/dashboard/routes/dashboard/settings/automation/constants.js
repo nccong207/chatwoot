@@ -2,9 +2,27 @@ import {
   OPERATOR_TYPES_1,
   OPERATOR_TYPES_2,
   OPERATOR_TYPES_3,
+  OPERATOR_TYPES_4,
+  OPERATOR_TYPES_5,
   OPERATOR_TYPES_6,
 } from './operators';
 
+// This constant contains the configurations which we use/prepare for the following
+//  automationTypes, getAutomationType, getInputType, getOperators, ...
+//
+// Format
+// - Parent Key (event_name)
+//   - conditions: []
+//      - Object
+//        - key (condition_key)
+//        - name (just to be clearer, not used (use i18n instead))
+//        - attributeI18nKey: i18n translation of "CONTACTS_FILTER.ATTRIBUTES.[...]" into "vi/contactFilters.json"
+//        - inputType: "plain_text" :  supported ["plain_text", "multi_select", "search_select", "date"]
+//        - filterOperators: ["equal_to", "not_equal_to", "contains", "does_not_contain", "is_present", "is_not_present", "is_greater_than", "is_less_than", "days_before", "starts_with"]
+//   - actions: []
+//      - Object
+//        - key (action_key)
+//        - name (just to be clearer, not used (use i18n instead))
 export const AUTOMATIONS = {
   message_created: {
     conditions: [
@@ -157,10 +175,11 @@ export const AUTOMATIONS = {
         key: 'assign_team',
         name: 'Assign a team',
       },
-      {
-        key: 'assign_agent',
-        name: 'Assign an agent',
-      },
+      // Duplicated Key
+      // {
+      //   key: 'assign_agent',
+      //   name: 'Assign an agent',
+      // },
       {
         key: 'send_email_to_team',
         name: 'Send an email to team',
@@ -270,10 +289,11 @@ export const AUTOMATIONS = {
         key: 'assign_team',
         name: 'Assign a team',
       },
-      {
-        key: 'assign_agent',
-        name: 'Assign an agent',
-      },
+      // Duplicated Key
+      // {
+      //   key: 'assign_agent',
+      //   name: 'Assign an agent',
+      // },
       {
         key: 'send_email_to_team',
         name: 'Send an email to team',
@@ -380,11 +400,12 @@ export const AUTOMATIONS = {
         key: 'assign_team',
         name: 'Assign a team',
       },
-      {
-        key: 'assign_agent',
-        name: 'Assign an agent',
-        attributeI18nKey: 'ASSIGN_AGENT',
-      },
+      // Duplicated Key
+      // {
+      //   key: 'assign_agent',
+      //   name: 'Assign an agent',
+      //   attributeI18nKey: 'ASSIGN_AGENT',
+      // },
       {
         key: 'send_email_to_team',
         name: 'Send an email to team',
@@ -415,8 +436,301 @@ export const AUTOMATIONS = {
       },
     ],
   },
+  contact_created: {
+    conditions: [
+      {
+        key: 'name',
+        attributeI18nKey: 'NAME',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_1,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'email',
+        attributeI18nKey: 'EMAIL',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_2,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'phone_number',
+        attributeI18nKey: 'PHONE_NUMBER',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_6,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'initial_channel_type',
+        attributeI18nKey: 'INITIAL_CHANNEL',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_1,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'stage_id',
+        attributeI18nKey: 'STAGE',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'assignee_id',
+        attributeI18nKey: 'ASSIGNEE_ID',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'team_id',
+        attributeI18nKey: 'TEAM',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'product_id',
+        attributeI18nKey: 'PRODUCT',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'po_value',
+        attributeI18nKey: 'PO_VALUE',
+        inputType: 'number',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_4,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'po_date',
+        attributeI18nKey: 'PO_DATE',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'created_at',
+        attributeI18nKey: 'CREATED_AT',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attributeModel: 'standard',
+      },
+      {
+        key: 'last_activity_at',
+        attributeI18nKey: 'LAST_ACTIVITY',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attributeModel: 'standard',
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'Assign to agent',
+      },
+      {
+        key: 'assign_team',
+        name: 'Assign a team',
+      },
+      {
+        key: 'update_contact_stage',
+        name: 'Update Contact Stage',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'Send an email to team',
+      },
+      {
+        key: 'send_message',
+        name: 'Send a message',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'Send an email transcript',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'Mute conversation',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'Snooze conversation',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'Resolve conversation',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'Send Webhook Event',
+      },
+      {
+        key: 'send_attachment',
+        name: 'Send Attachment',
+      },
+    ],
+  },
+  contact_updated: {
+    conditions: [
+      {
+        key: 'name',
+        attributeI18nKey: 'NAME',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_1,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'email',
+        attributeI18nKey: 'EMAIL',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_2,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'phone_number',
+        attributeI18nKey: 'PHONE_NUMBER',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_6,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'initial_channel_type',
+        attributeI18nKey: 'INITIAL_CHANNEL',
+        inputType: 'plain_text',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_1,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'stage_id',
+        attributeI18nKey: 'STAGE',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'assignee_id',
+        attributeI18nKey: 'ASSIGNEE_ID',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'team_id',
+        attributeI18nKey: 'TEAM',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'product_id',
+        attributeI18nKey: 'PRODUCT',
+        inputType: 'search_select',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_3,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'po_value',
+        attributeI18nKey: 'PO_VALUE',
+        inputType: 'number',
+        dataType: 'number',
+        filterOperators: OPERATOR_TYPES_4,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'po_date',
+        attributeI18nKey: 'PO_DATE',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attribute_type: 'standard',
+      },
+      {
+        key: 'created_at',
+        attributeI18nKey: 'CREATED_AT',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attributeModel: 'standard',
+      },
+      {
+        key: 'last_activity_at',
+        attributeI18nKey: 'LAST_ACTIVITY',
+        inputType: 'date',
+        dataType: 'text',
+        filterOperators: OPERATOR_TYPES_5,
+        attributeModel: 'standard',
+      },
+    ],
+    actions: [
+      {
+        key: 'assign_agent',
+        name: 'Assign to agent',
+      },
+      {
+        key: 'assign_team',
+        name: 'Assign a team',
+      },
+      {
+        key: 'update_contact_stage',
+        name: 'Update Contact Stage',
+      },
+      {
+        key: 'send_email_to_team',
+        name: 'Send an email to team',
+      },
+      {
+        key: 'send_message',
+        name: 'Send a message',
+      },
+      {
+        key: 'send_email_transcript',
+        name: 'Send an email transcript',
+      },
+      {
+        key: 'mute_conversation',
+        name: 'Mute conversation',
+      },
+      {
+        key: 'snooze_conversation',
+        name: 'Snooze conversation',
+      },
+      {
+        key: 'resolve_conversation',
+        name: 'Resolve conversation',
+      },
+      {
+        key: 'send_webhook_event',
+        name: 'Send Webhook Event',
+      },
+      {
+        key: 'send_attachment',
+        name: 'Send Attachment',
+      },
+    ], // Nguoi/Nhom Phu Trach, Ghi chu, Lich lien he, them nhan, xoa nhan, custom: chi nhanh,
+  },
 };
 
+// We prepare this constant for the event dropdown in automation rule forms
 export const AUTOMATION_RULE_EVENTS = [
   {
     key: 'conversation_created',
@@ -434,8 +748,26 @@ export const AUTOMATION_RULE_EVENTS = [
     key: 'conversation_opened',
     value: 'Conversation Opened',
   },
+  {
+    key: 'contact_created',
+    value: 'Contact Created',
+  },
+  {
+    key: 'contact_updated',
+    value: 'Contact Updated',
+  },
 ];
 
+// We prepare this constant for the 'action' section in automation rule forms
+//
+// Format
+// - []
+//   - Object
+//      - Object
+//        - key (action_key)
+//        - label (just to be clearer, not used (use i18n instead))
+//        - attributeI18nKey: i18n translation of "AUTOMATION.ACTIONS_TEXT.[...]" into "vi/automation.json"
+//        - inputType: supported ["plain_text", "multi_select", "search_select", "date", "email", "url", "attachment", "team_message", "text_area"]
 export const AUTOMATION_ACTION_TYPES = [
   {
     key: 'assign_agent',
@@ -448,6 +780,12 @@ export const AUTOMATION_ACTION_TYPES = [
     label: 'Assign a team',
     inputType: 'search_select',
     attributeI18nKey: 'ASSIGN_TEAM',
+  },
+  {
+    key: 'update_contact_stage',
+    label: 'Update contact stage',
+    inputType: 'search_select',
+    attributeI18nKey: 'UPDATE_CONTACT_STAGE',
   },
   {
     key: 'add_label',
@@ -528,3 +866,5 @@ export const AUTOMATION_ACTION_TYPES = [
     attributeI18nKey: 'ADD_SLA',
   },
 ];
+
+export const AUTOMATION_CONTACT_EVENTS = ['contact_created', 'contact_updated'];
