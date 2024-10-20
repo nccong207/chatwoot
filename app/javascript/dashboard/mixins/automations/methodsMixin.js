@@ -1,3 +1,7 @@
+// This file contains the mixin methods which we use for the following
+//  1. Automation Rule Add Form Modal (app/javascript/dashboard/routes/dashboard/settings/automation/AddAutomationRule.vue)
+//  2. Automation Rule Edit Form Modal (app/javascript/dashboard/routes/dashboard/settings/automation/EditAutomationRule.vue)
+
 import languages from 'dashboard/components/widgets/conversation/advancedFilterItems/languages';
 import countries from 'shared/constants/countries';
 import {
@@ -82,6 +86,16 @@ export default {
       return this.automationTypes[key].conditions;
     },
     getAttributeGroups(key) {
+      // This method is to get conditions (options for grouped condition dropdown) by event key
+      // Format
+      // - []
+      //  - Object
+      //    - name (group_name):
+      //      i18n translation of "CONTACTS_FILTER.GROUPS.[...]" : supported ["STANDARD_FILTERS", "CUSTOM_ATTRIBUTES", "PRODUCT_CUSTOM_ATTRIBUTES (only for contact events)"]
+      //    - attributes (group children items): []
+      //      - Object
+      //        - key (condition attribute_key)
+      //        - name (condition attribute_name)
       if (!AUTOMATION_CONTACT_EVENTS.includes(key))
         // They would be shown by groups instead of single items
         return [];
@@ -142,7 +156,7 @@ export default {
     },
     getInputType(key) {
       // This method helps get type of user input into 'condition' section
-      // Examples: date | multi_select | search_select | plain_text(default)
+      // Supported: date | multi_select | search_select | plain_text(default)
       const customAttribute = isACustomAttribute(this.allCustomAttributes, key);
 
       if (customAttribute) {
@@ -361,6 +375,7 @@ export default {
       });
     },
     manifestCustomAttributes() {
+      // TODO: This should be grouped
       const conversationCustomAttributesRaw = this.$store.getters[
         'attributes/getAttributesByModel'
       ]('conversation_attribute');

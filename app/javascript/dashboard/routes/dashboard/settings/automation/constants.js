@@ -5,9 +5,24 @@ import {
   OPERATOR_TYPES_4,
   OPERATOR_TYPES_5,
   OPERATOR_TYPES_6,
-  OPERATOR_TYPES_7,
 } from './operators';
 
+// This constant contains the configurations which we use/prepare for the following
+//  automationTypes, getAutomationType, getInputType, getOperators, ...
+//
+// Format
+// - Parent Key (event_name)
+//   - conditions: []
+//      - Object
+//        - key (condition_key)
+//        - name (just to be clearer, not used (use i18n instead))
+//        - attributeI18nKey: i18n translation of "CONTACTS_FILTER.ATTRIBUTES.[...]" into "vi/contactFilters.json"
+//        - inputType: "plain_text" :  supported ["plain_text", "multi_select", "search_select", "date"]
+//        - filterOperators: ["equal_to", "not_equal_to", "contains", "does_not_contain", "is_present", "is_not_present", "is_greater_than", "is_less_than", "days_before", "starts_with"]
+//   - actions: []
+//      - Object
+//        - key (action_key)
+//        - name (just to be clearer, not used (use i18n instead))
 export const AUTOMATIONS = {
   message_created: {
     conditions: [
@@ -436,7 +451,7 @@ export const AUTOMATIONS = {
         attributeI18nKey: 'EMAIL',
         inputType: 'plain_text',
         dataType: 'text',
-        filterOperators: OPERATOR_TYPES_7,
+        filterOperators: OPERATOR_TYPES_2,
         attribute_type: 'standard',
       },
       {
@@ -444,7 +459,7 @@ export const AUTOMATIONS = {
         attributeI18nKey: 'PHONE_NUMBER',
         inputType: 'plain_text',
         dataType: 'text',
-        filterOperators: OPERATOR_TYPES_7,
+        filterOperators: OPERATOR_TYPES_6,
         attribute_type: 'standard',
       },
       {
@@ -582,7 +597,7 @@ export const AUTOMATIONS = {
         attributeI18nKey: 'EMAIL',
         inputType: 'plain_text',
         dataType: 'text',
-        filterOperators: OPERATOR_TYPES_7,
+        filterOperators: OPERATOR_TYPES_2,
         attribute_type: 'standard',
       },
       {
@@ -590,7 +605,7 @@ export const AUTOMATIONS = {
         attributeI18nKey: 'PHONE_NUMBER',
         inputType: 'plain_text',
         dataType: 'text',
-        filterOperators: OPERATOR_TYPES_7,
+        filterOperators: OPERATOR_TYPES_6,
         attribute_type: 'standard',
       },
       {
@@ -715,7 +730,7 @@ export const AUTOMATIONS = {
   },
 };
 
-// NOTE: USE FOR THE EVENT SELECT DROPDOWN
+// We prepare this constant for the event dropdown in automation rule forms
 export const AUTOMATION_RULE_EVENTS = [
   {
     key: 'conversation_created',
@@ -743,6 +758,16 @@ export const AUTOMATION_RULE_EVENTS = [
   },
 ];
 
+// We prepare this constant for the 'action' section in automation rule forms
+//
+// Format
+// - []
+//   - Object
+//      - Object
+//        - key (action_key)
+//        - label (just to be clearer, not used (use i18n instead))
+//        - attributeI18nKey: i18n translation of "AUTOMATION.ACTIONS_TEXT.[...]" into "vi/automation.json"
+//        - inputType: supported ["plain_text", "multi_select", "search_select", "date", "email", "url", "attachment", "team_message", "text_area"]
 export const AUTOMATION_ACTION_TYPES = [
   {
     key: 'assign_agent',
